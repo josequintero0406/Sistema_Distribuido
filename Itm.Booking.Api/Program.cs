@@ -93,9 +93,15 @@ app.MapPost("/api/bookings", async (BookingRequest request, IHttpClientFactory f
     try
     {   // 7. SIMULACIÓN DE PAGO (Punto Crítico)
         bool paymentSuccess = new Random().Next(1, 10) > 5;
-        if (!paymentSuccess) throw new Exception("Fondos insuficientes en la tarjeta de crédito.");
+        if (!paymentSuccess) 
+            throw new Exception("Fondos insuficientes en la tarjeta de crédito.");
+
+        var sillasRestantes = eventDto!.SillasDisponibles - request.Tickets;
+
+        var eventDtoActualizado = eventDto with { SillasDisponibles = sillasRestantes };
+
         return Results.Ok(new { Status = "Éxito", Message = "Haz pagado $" + Total + 
-            " exitosamente, disfruta del evento!", Event = eventDto, Discount = discountDto });
+            " exitosamente, disfruta del evento!", Event = eventDtoActualizado, Discount = discountDto });
     }
     catch (Exception ex)
     {
